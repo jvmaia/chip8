@@ -76,9 +76,28 @@ class Chip8:
     def __init__(self):
         self.stack = deque()
         self.memory = MEMORY
+        self.variable_registers = [0 for i in range(16)]
+        self.PC = 0x0
+        self.I = 0x0
+        self.delay_timer = 60
+        self.sound_timer = 60
         # load font in memory
         for index, char in enumerate(FONT):
             self.memory[80 + index] = char
+
+        try:
+            self.load_game(sys.argv[-1])
+        except IndexError:
+            raise Exception('Please provide the program path')
+
+        print(self.memory)
+
+    def load_game(self, game_path):
+        with open(game_path, 'rb') as game_file:
+            game = game_file.read()
+
+        for index, byte in enumerate(game):
+            self.memory[200 + index] = hex(byte)
 
     def start_game(self):
         self.display = Display()
@@ -90,3 +109,4 @@ class Chip8:
                 elif event.type == pygame.KEYDOWN:
                     print(f'{KEYBOARD_MAPPING.get(event.key)} PRESSED')
 
+chip8 = Chip8()
